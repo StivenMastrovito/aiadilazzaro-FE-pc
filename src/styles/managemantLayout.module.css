@@ -1,0 +1,73 @@
+/* Il contenitore principale che racchiude tutto */
+.container {
+    display: flex;
+    min-height: 100vh;
+    background-color: #0c110e;
+    color: #ffffff;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.header {
+    width: 260px;
+    background-color: var(--main-color);
+    display: flex;
+    flex-direction: column;
+    padding: 25px 24px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    border-right: 3px solid var(--second-color);
+}
+
+.button_option {
+    margin-bottom: 30px;
+    padding: 10px 15px;
+    border: 1px solid orange;
+    border-radius: 10px;
+    background: orange;
+}
+
+.button_option a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.3rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    display: block;
+}
+
+.nav {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    /* Spazio tra un link e l'altro */
+}
+.nav a {
+    color: #c2d1be;
+    /* Colore del testo quando non è selezionato */
+    text-decoration: none;
+    font-size: 1.05rem;
+    padding: 12px 16px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    display: block;
+}
+
+.nav a:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+}
+
+.nav a[class*="active"] {
+    color: #ffffff;
+    font-weight: 600;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.content {
+    flex-grow: 1;
+    box-sizing: border-box;
+    overflow-y: auto;
+}

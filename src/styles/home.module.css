@@ -1,0 +1,29 @@
+.container {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--main-color);
+    flex-direction: column;
+    gap: 20px;
+    padding: 80px 50px 20px 50px;
+    align-items: center;
+}
+
+.logo {
+    max-width: 250px;
+}
+
+.button_section {
+    display: flex;
+    gap: 5px;
+}
+
+.button_section a {
+    font-family: 'Times New Roman', Times, serif;
+    padding: 10px 20px;
+    border: none;
+    font-size: 1.5rem;
+    background-color: #efd3a2;
+    border-radius: 7px;
+    color: var(--main-color);
+    font-weight: 800;
+}

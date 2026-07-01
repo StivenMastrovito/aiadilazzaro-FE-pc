@@ -38,7 +38,6 @@ function DataContextProvider({ children }) {
                 'postgres_changes',
                 { event: '*', schema: 'public', table: 'order_product' },
                 async (payload) => {
-                    console.log('PAYLOAD RICEVUTO:', payload)
 
                     clearTimeout(debounceTimer);
                     debounceTimer = setTimeout(async () => {
@@ -71,6 +70,7 @@ function DataContextProvider({ children }) {
                                 peoples: response.data.order.peoples,
                                 products: kitchenProducts,
                             };
+                            console.log('stampa cucina', kitchenProducts);
 
                             stampaComanda(order);
                         }
@@ -91,7 +91,8 @@ function DataContextProvider({ children }) {
                                 peoples: response.data.order.peoples,
                                 products: barProducts,
                             };
-                            
+                            console.log('stampa bar', orderBar);
+
                             stampaBar(orderBar);
                         }
 

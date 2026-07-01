@@ -47,10 +47,16 @@ function DataContextProvider({ children }) {
                         );
                         console.log(response);
                         if (!response.data.products.length) return;
-                        const productsKitchen = response.data.products.map(p => p.product.category_id !== 5);
-                        const productsBar = response.data.products.map(p => p.product.category_id === 5);
+                        const productsKitchen = response.data.products.filter(
+                            p => p.product.category_id !== 5
+                        );
+
+                        const productsBar = response.data.products.filter(
+                            p => p.product.category_id === 5
+                        );
+
                         if (productsKitchen.length > 0) {
-                            const products = productsKitchen.map(item => ({
+                            const kitchenProducts = productsKitchen.map(item => ({
                                 ...item.product,
                                 pivot: {
                                     qty: item.qty,
@@ -62,14 +68,15 @@ function DataContextProvider({ children }) {
                             const order = {
                                 number_order: response.data.order.number_order,
                                 table: response.data.order.table.name,
-                                productsKitchen,
-                            }
+                                peoples: response.data.order.peoples,
+                                products: kitchenProducts,
+                            };
 
                             stampaComanda(order);
                         }
 
                         if (productsBar.length > 0) {
-                            const productsBar = productsBar.map(item => ({
+                            const barProducts = productsBar.map(item => ({
                                 ...item.product,
                                 pivot: {
                                     qty: item.qty,
@@ -81,9 +88,10 @@ function DataContextProvider({ children }) {
                             const orderBar = {
                                 number_order: response.data.order.number_order,
                                 table: response.data.order.table.name,
-                                productsBar,
-                            }
-
+                                peoples: response.data.order.peoples,
+                                products: barProducts,
+                            };
+                            
                             stampaBar(orderBar);
                         }
 

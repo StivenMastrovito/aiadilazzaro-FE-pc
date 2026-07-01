@@ -46,9 +46,9 @@ function DataContextProvider({ children }) {
                             `${import.meta.env.VITE_BACKEND_URL}/api/orders/getUnprinted/${payload.new.order_id}`
                         );
                         console.log(response);
+                        if (!response.data.products.length) return;
                         const productsKitchen = response.data.products.map(p => p.product.category_id !== 5);
                         const productsBar = response.data.products.map(p => p.product.category_id === 5);
-
                         if (productsKitchen.length > 0) {
                             const products = productsKitchen.map(item => ({
                                 ...item.product,
@@ -86,7 +86,6 @@ function DataContextProvider({ children }) {
 
                             stampaBar(orderBar);
                         }
-
 
 
                         const array_id = response.data.products.map(item => item.id);

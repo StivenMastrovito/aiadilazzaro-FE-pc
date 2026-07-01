@@ -42,24 +42,36 @@ async function stampaComanda(order) {
         const config = qz.configs.create(printer)
 
         const data = [
-            '\x1B\x40',                          // init
-            '\x1B\x61\x01',                      // centra
-            '\x1B\x21\x30',                      // font grande
-            '*** CUCINA ***\n',
-            '\x1B\x21\x00',                      // font normale
-            '\x1B\x61\x00',                      // sinistra
-            '--------------------------------\n',
-            `\x1B\x45\x01Tavolo: ${order.table}\x1B\x45\x00\n`,
-            `Ordine #${order.number_order}\n`,
-            `Ora: ${new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}\n`,
-            '--------------------------------\n\n',
+            '\x1B\x40',          // Init
+            '\x1B\x61\x01',      // Centro
 
-            // Raggruppa per scope
+            '\x1B\x45\x01',
+            '\x1B\x21\x20',      // Font doppia altezza
+            'CUCINA\n',
+            '\x1B\x45\x00',
+
+            '\x1B\x21\x00',
+
+            '================================================\n',
+
+            '\x1B\x61\x00',
+
+            `Tavolo : ${order.table}\n`,
+            `Ordine : #${order.number_order}\n`,
+            `Ora    : ${new Date().toLocaleTimeString('it-IT', {
+                hour: '2-digit',
+                minute: '2-digit'
+            })}\n`,
+
+            '================================================\n\n',
+
             ...groupByScope(order.products),
 
-            '--------------------------------\n',
+            '\n',
+            '================================================\n',
+
             '\n\n\n',
-            '\x1D\x56\x42\x00',                 // taglia carta
+            '\x1D\x56\x42\x00'
         ]
 
         await qz.print(config, data)
@@ -71,104 +83,177 @@ async function stampaComanda(order) {
 }
 
 function groupByScope(products) {
-    const lines = []
 
-    // Raggruppa per scope
+    const lines = [];
+
     const grouped = products.reduce((acc, p) => {
-        const scope = p.pivot.scope ?? 1
-        if (!acc[scope]) acc[scope] = []
-        acc[scope].push(p)
-        return acc
-    }, {})
+
+        const scope = p.pivot.scope ?? 1;
+
+        if (!acc[scope]) {
+            acc[scope] = [];
+        }
+
+        acc[scope].push(p);
+
+        return acc;
+
+    }, {});
 
     Object.keys(grouped).sort().forEach(scope => {
-        lines.push(`\x1B\x45\x01-- PORTATA ${scope} --\x1B\x45\x00\n`)
+
+        lines.push('\x1B\x61\x01');
+        lines.push('\x1B\x45\x01');
+        lines.push('\x1B\x21\x10');
+        lines.push(`PORTATA ${scope}\n`);
+        lines.push('\x1B\x45\x00');
+        lines.push('\x1B\x61\x00');
+
+        lines.push('------------------------------------------------\n');
 
         grouped[scope].forEach(p => {
-            // Salta le bevande
-            if (p.category_id === 5) return
 
-            lines.push('\x1B\x21\x10')  // font grande
-            lines.push(`${p.pivot.qty}x ${p.name}\n`)
-            lines.push('\x1B\x21\x00')  // font normale
+            if (p.category_id === 5) return;
+
+            lines.push('\x1B\x21\x10');      // doppia altezza
+
+            lines.push(`${p.pivot.qty} x ${p.name}\n`);
+
+            lines.push('\x1B\x21\x00');
 
             if (p.pivot.note) {
-                lines.push(`  !! ${p.pivot.note.toUpperCase()}\n`)
+
+                lines.push('\x1B\x45\x01');
+                lines.push(`   >>> ${p.pivot.note.toUpperCase()}\n`);
+                lines.push('\x1B\x45\x00');
+
             }
-        })
 
-        lines.push('\n')
-    })
+            lines.push('\n');
 
-    return lines
+        });
+
+    });
+
+    return lines;
 }
 
 async function stampaPreconto(order) {
-    try {
-        await connectQZ()
 
-        const printer = await qz.printers.find('bar')
-        const config = qz.configs.create(printer)
+    try {
+
+        await connectQZ();
+
+        const printer = await qz.printers.find('bar');
+        const config = qz.configs.create(printer);
+
+        const lineWidth = 48;
+
+        const formatLine = (left, right) => {
+            const spaces = Math.max(1, lineWidth - left.length - right.length);
+            return left + ' '.repeat(spaces) + right + '\n';
+        };
+
+        const coperto = order.peoples * 2;
+        const totale = parseFloat(order.total_price);
+        const quotaPersona = totale / order.peoples;
 
         const data = [
-            '\x1B\x40',                          // init
-            '\x1B\x61\x01',                      // centra
-            '\x1B\x21\x30',                      // font grande
-            'AIA DI LAZZARO\n',
-            '\x1B\x21\x00',                      // font normale
-            '\x1B\x61\x00',                      // sinistra
-            '--------------------------------\n',
-            `Tavolo: ${order.table.number} - ${order.name}\n`,
-            `Ordine #${order.number_order}\n`,
-            `Coperti: ${order.peoples}\n`,
-            `Ora: ${new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}\n`,
-            '--------------------------------\n\n',
 
-            // Prodotti
-            ...order.products.map(p => {
-                const qty = p.pivot.qty
-                const total = (parseFloat(p.price) * qty).toFixed(2)
-                const line = `${qty}x ${p.name}`
-                const price = `${total}EUR`
-                const spaces = Math.max(1, 32 - line.length - price.length)
-                return line + ' '.repeat(spaces) + price + '\n'
+            '\x1B\x40',          // Init
+
+            '\x1B\x61\x01',      // Centro
+            '\x1B\x45\x01',      // Bold
+            '\x1B\x21\x20',      // Doppia altezza
+
+            'AIA DI LAZZARO\n',
+
+            '\x1B\x45\x00',
+            '\x1B\x21\x00',
+
+            '================================================\n',
+
+            '\x1B\x61\x00',
+
+            `Tavolo : ${order.table.number}\n`,
+            `Cliente: ${order.name}\n`,
+            `Ordine : #${order.number_order}\n`,
+            `Coperti: ${order.peoples}\n`,
+            `Ora    : ${new Date().toLocaleTimeString('it-IT', {
+                hour: '2-digit',
+                minute: '2-digit'
+            })}\n`,
+
+            '================================================\n\n',
+
+            ...order.products.flatMap(p => {
+
+                const qty = p.pivot.qty;
+                const total = (parseFloat(p.price) * qty).toFixed(2);
+
+                const rows = [];
+
+                rows.push(
+                    formatLine(
+                        `${qty} x ${p.name}`,
+                        `${total} €`
+                    )
+                );
+
+                if (p.pivot.note) {
+                    rows.push(
+                        `   >>> ${p.pivot.note.toUpperCase()}\n`
+                    );
+                }
+
+                rows.push('\n');
+
+                return rows;
+
             }),
 
-            '--------------------------------\n',
+            '------------------------------------------------\n',
 
-            // Coperto
-            (() => {
-                const coperto = order.peoples * 2
-                const label = `${order.peoples}x Coperto`
-                const price = `${coperto.toFixed(2)}EUR`
-                const spaces = Math.max(1, 32 - label.length - price.length)
-                return label + ' '.repeat(spaces) + price + '\n'
-            })(),
+            formatLine(
+                `${order.peoples} x Coperto`,
+                `${coperto.toFixed(2)} €`
+            ),
 
-            '--------------------------------\n',
+            '================================================\n',
 
-            // Totale
-            '\x1B\x45\x01',                     // grassetto on
-            (() => {
-                const label = 'TOTALE:'
-                const price = `${parseFloat(order.total_price).toFixed(2)}EUR`
-                const spaces = Math.max(1, 32 - label.length - price.length)
-                return label + ' '.repeat(spaces) + price + '\n'
-            })(),
-            '\x1B\x45\x00',                     // grassetto off
+            '\x1B\x45\x01',
+            '\x1B\x21\x10',
 
-            '\n',
-            '\x1B\x61\x01',                     // centra
+            formatLine(
+                'TOTALE',
+                `${totale.toFixed(2)} €`
+            ),
+
+            '\x1B\x21\x00',
+            '\x1B\x45\x00',
+
+            '------------------------------------------------\n',
+
+            formatLine(
+                'A PERSONA',
+                `${quotaPersona.toFixed(2)} €`
+            ),
+
+            '================================================\n\n',
+
+            '\x1B\x61\x01',
+
             'Grazie e arrivederci!\n',
+
             '\n\n\n',
-            '\x1D\x56\x42\x00',                 // taglia carta
-        ]
 
-        await qz.print(config, data)
-        console.log('Preconto inviato ✅')
+            '\x1D\x56\x42\x00'
 
+        ];
+        await qz.print(config, data);
+        console.log('Preconto inviato ✅');
     } catch (err) {
-        console.error('Errore stampa preconto:', err)
+        console.error('Errore stampa preconto:', err);
     }
 }
 

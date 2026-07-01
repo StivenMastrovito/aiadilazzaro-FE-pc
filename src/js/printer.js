@@ -48,6 +48,8 @@ async function stampaComanda(order) {
             '\x1B\x45\x01',
             '\x1B\x21\x20',      // Font doppia altezza
             'CUCINA\n',
+            '\x1B\x21\x10',
+            `Tavolo: ${order.table} - ${order.number_order}\n`,
             '\x1B\x45\x00',
 
             '\x1B\x21\x00',
@@ -56,8 +58,7 @@ async function stampaComanda(order) {
 
             '\x1B\x61\x00',
 
-            `Tavolo : ${order.table}\n`,
-            `Ordine : #${order.number_order}\n`,
+            `Coperti : #${order.peoples}\n`,
             `Ora    : ${new Date().toLocaleTimeString('it-IT', {
                 hour: '2-digit',
                 minute: '2-digit'
@@ -80,6 +81,78 @@ async function stampaComanda(order) {
     } catch (err) {
         console.error('Errore stampa:', err)
     }
+}
+
+async function stampaComanda(order) {
+    try {
+        await connectQZ()
+
+        const printer = await qz.printers.find('bar')
+        const config = qz.configs.create(printer)
+
+        const data = [
+            '\x1B\x40',          // Init
+            '\x1B\x61\x01',      // Centro
+
+            '\x1B\x45\x01',
+            '\x1B\x21\x20',      // Font doppia altezza
+            'BAR\n',
+            '\x1B\x21\x10',
+            `Tavolo: ${order.table} - ${order.number_order}\n`,
+            '\x1B\x45\x00',
+
+            '\x1B\x21\x00',
+
+            '================================================\n',
+
+            '\x1B\x61\x00',
+
+            `Coperti : #${order.peoples}\n`,
+            `Ora    : ${new Date().toLocaleTimeString('it-IT', {
+                hour: '2-digit',
+                minute: '2-digit'
+            })}\n`,
+
+            '================================================\n\n',
+
+            ...groupBar(order.products),
+
+            '\n',
+            '================================================\n',
+
+            '\n\n\n',
+            '\x1D\x56\x42\x00'
+        ]
+
+        await qz.print(config, data)
+        console.log('Comanda inviata ✅')
+
+    } catch (err) {
+        console.error('Errore stampa:', err)
+    }
+}
+
+function groupBar(products) {
+    const lines = [];
+    products.forEach(p => {
+        lines.push('\x1B\x21\x10');
+
+        lines.push(`${p.pivot.qty}x ${p.name.toUpperCase()}\n`);
+
+        lines.push('\x1B\x21\x00');
+
+        if (p.pivot.note) {
+
+            lines.push('\x1B\x45\x01');
+            lines.push(`   >>> ${p.pivot.note.toUpperCase()}\n`);
+            lines.push('\x1B\x45\x00');
+
+        }
+
+        lines.push('\n');
+    })
+
+    return lines;
 }
 
 function groupByScope(products) {
@@ -117,7 +190,7 @@ function groupByScope(products) {
 
             lines.push('\x1B\x21\x10');      // doppia altezza
 
-            lines.push(`${p.pivot.qty} x ${p.name}\n`);
+            lines.push(`${p.pivot.qty}x ${p.name.toUpperCase()}\n`);
 
             lines.push('\x1B\x21\x00');
 
@@ -196,7 +269,7 @@ async function stampaPreconto(order) {
                 rows.push(
                     formatLine(
                         `${qty} x ${p.name}`,
-                        `${total} €`
+                        `${total} EUR`
                     )
                 );
 
@@ -216,7 +289,7 @@ async function stampaPreconto(order) {
 
             formatLine(
                 `${order.peoples} x Coperto`,
-                `${coperto.toFixed(2)} €`
+                `${coperto.toFixed(2)} EUR`
             ),
 
             '================================================\n',
@@ -226,7 +299,7 @@ async function stampaPreconto(order) {
 
             formatLine(
                 'TOTALE',
-                `${totale.toFixed(2)} €`
+                `${totale.toFixed(2)} EUR`
             ),
 
             '\x1B\x21\x00',
@@ -236,7 +309,7 @@ async function stampaPreconto(order) {
 
             formatLine(
                 'A PERSONA',
-                `${quotaPersona.toFixed(2)} €`
+                `${quotaPersona.toFixed(2)} EUR`
             ),
 
             '================================================\n\n',
@@ -244,7 +317,8 @@ async function stampaPreconto(order) {
             '\x1B\x61\x01',
 
             'Grazie e arrivederci!\n',
-
+            'Si prega di ritirare lo scontrino alla cassa.\n',
+            'La presente ricevuta non ha valore fiscale.\n',
             '\n\n\n',
 
             '\x1D\x56\x42\x00'

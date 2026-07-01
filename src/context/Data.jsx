@@ -1,7 +1,7 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 import supabase from '../js/realtime'
-import {stampaComanda} from '../js/printer'
+import { stampaComanda } from '../js/printer'
 
 const dataContext = createContext();
 
@@ -40,32 +40,54 @@ function DataContextProvider({ children }) {
                 async (payload) => {
                     console.log('PAYLOAD RICEVUTO:', payload)
 
-                    // Cancella il timer precedente e ne crea uno nuovo
                     clearTimeout(debounceTimer);
                     debounceTimer = setTimeout(async () => {
                         const response = await axios.post(
                             `${import.meta.env.VITE_BACKEND_URL}/api/orders/getUnprinted/${payload.new.order_id}`
                         );
                         console.log(response);
-                        
-                        if (!response.data.products.length) return; // niente da stampare
+                        const productsKitchen = response.data.products.map(p => p.product.category_id !== 5);
+                        const productsBar = response.data.products.map(p => p.product.category_id === 5);
 
-                        const products = response.data.products.map(item => ({
-                            ...item.product,
-                            pivot: {
-                                qty: item.qty,
-                                note: item.note,
-                                scope: item.scope,
+                        if (productsKitchen.length > 0) {
+                            const products = productsKitchen.map(item => ({
+                                ...item.product,
+                                pivot: {
+                                    qty: item.qty,
+                                    note: item.note,
+                                    scope: item.scope,
+                                }
+                            }));
+
+                            const order = {
+                                number_order: response.data.order.number_order,
+                                table: response.data.order.table.name,
+                                productsKitchen,
                             }
-                        }));
 
-                        const order = {
-                            number_order: response.data.order.number_order,
-                            table: response.data.order.table.name,
-                            products,
+                            stampaComanda(order);
                         }
 
-                        stampaComanda(order);
+                        if (productsBar.length > 0) {
+                            const productsBar = productsBar.map(item => ({
+                                ...item.product,
+                                pivot: {
+                                    qty: item.qty,
+                                    note: item.note,
+                                    scope: item.scope,
+                                }
+                            }));
+
+                            const orderBar = {
+                                number_order: response.data.order.number_order,
+                                table: response.data.order.table.name,
+                                productsBar,
+                            }
+
+                            stampaBar(orderBar);
+                        }
+
+
 
                         const array_id = response.data.products.map(item => item.id);
                         await axios.post(
@@ -73,7 +95,7 @@ function DataContextProvider({ children }) {
                             { array_id }
                         );
 
-                    }, 3000); // aspetta 1.5 secondi dall'ultimo evento
+                    }, 3000);
                 }
             )
             .subscribe((status) => console.log('Orders:', status))

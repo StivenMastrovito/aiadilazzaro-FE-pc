@@ -279,7 +279,7 @@ export default function Order() {
                             INDIETRO
                         </Link>
                         <div onClick={() => setShowFormName(true)} style={{ 'cursor': "pointer" }}>
-                            TAVOLO: {order?.table.number} - {order && order.name}
+                            TAVOLO: {order?.table.number || 'N/A'} - {order && order.name}
                         </div>
                         <div onClick={() => setShowFormPeoples(true)} style={{ 'cursor': "pointer" }} >
                             COPERTI: {order && order.peoples}

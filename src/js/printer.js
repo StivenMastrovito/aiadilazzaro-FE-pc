@@ -83,7 +83,7 @@ async function stampaComanda(order) {
     }
 }
 
-async function stampaComanda(order) {
+async function stampaBar(order) {
     try {
         await connectQZ()
 

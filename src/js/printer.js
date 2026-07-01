@@ -51,7 +51,7 @@ async function stampaComanda(order) {
             'CUCINA\n',
 
             '\x1B\x21\x30',      // Doppia altezza + doppia larghezza
-            `Tavolo ${order.table} - Ord. ${order.number_order}\n`,
+            `Tavolo ${order.table} - ${order.number_order}\n`,
 
             '\x1B\x21\x00',      // Torna normale
             '\x1B\x45\x00',      // Bold OFF
@@ -102,7 +102,7 @@ async function stampaBar(order) {
             'BAR\n',
 
             '\x1B\x21\x30',      // Doppia altezza + doppia larghezza
-            `Tavolo ${order.table} - Ord. ${order.number_order}\n`,
+            `Tavolo ${order.table} - ${order.number_order}\n`,
 
             '\x1B\x21\x00',      // Torna normale
             '\x1B\x45\x00',      // Bold OFF

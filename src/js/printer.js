@@ -38,7 +38,7 @@ async function stampaComanda(order) {
     try {
         await connectQZ()
 
-        const printer = await qz.printers.find('POS80 Printer USB')
+        const printer = await qz.printers.find('bar')
         const config = qz.configs.create(printer)
 
         const data = [
@@ -107,7 +107,7 @@ async function stampaPreconto(order) {
     try {
         await connectQZ()
 
-        const printer = await qz.printers.find('POS80 Printer USB')
+        const printer = await qz.printers.find('bar')
         const config = qz.configs.create(printer)
 
         const data = [

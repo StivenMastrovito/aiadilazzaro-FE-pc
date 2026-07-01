@@ -1,7 +1,7 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 import supabase from '../js/realtime'
-import { stampaComanda } from '../js/printer'
+import { stampaComanda, stampaBar } from '../js/printer'
 
 const dataContext = createContext();
 

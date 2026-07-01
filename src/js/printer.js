@@ -331,4 +331,4 @@ async function stampaPreconto(order) {
     }
 }
 
-export { stampaComanda, stampaPreconto }
+export { stampaComanda, stampaPreconto, stampaBar }

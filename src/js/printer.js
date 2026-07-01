@@ -45,14 +45,16 @@ async function stampaComanda(order) {
             '\x1B\x40',          // Init
             '\x1B\x61\x01',      // Centro
 
-            '\x1B\x45\x01',
-            '\x1B\x21\x20',      // Font doppia altezza
-            'CUCINA\n',
-            '\x1B\x21\x10',
-            `Tavolo: ${order.table} - ${order.number_order}\n`,
-            '\x1B\x45\x00',
+            '\x1B\x45\x01',      // Bold ON
+            '\x1B\x21\x20',      // Font doppio
 
-            '\x1B\x21\x00',
+            'CUCINA\n',
+
+            '\x1B\x21\x30',      // Doppia altezza + doppia larghezza
+            `Tavolo ${order.table} - Ord. ${order.number_order}\n`,
+
+            '\x1B\x21\x00',      // Torna normale
+            '\x1B\x45\x00',      // Bold OFF
 
             '================================================\n',
 
@@ -94,14 +96,16 @@ async function stampaBar(order) {
             '\x1B\x40',          // Init
             '\x1B\x61\x01',      // Centro
 
-            '\x1B\x45\x01',
-            '\x1B\x21\x20',      // Font doppia altezza
-            'BAR\n',
-            '\x1B\x21\x10',
-            `Tavolo: ${order.table} - ${order.number_order}\n`,
-            '\x1B\x45\x00',
+            '\x1B\x45\x01',      // Bold ON
+            '\x1B\x21\x20',      // Font doppio
 
-            '\x1B\x21\x00',
+            'BAR\n',
+
+            '\x1B\x21\x30',      // Doppia altezza + doppia larghezza
+            `Tavolo ${order.table} - Ord. ${order.number_order}\n`,
+
+            '\x1B\x21\x00',      // Torna normale
+            '\x1B\x45\x00',      // Bold OFF
 
             '================================================\n',
 
@@ -196,8 +200,12 @@ function groupByScope(products) {
 
             if (p.pivot.note) {
 
-                lines.push('\x1B\x45\x01');
+                lines.push('\x1B\x45\x01'); // Bold
+                lines.push('\x1B\x21\x10'); // Font grande
+
                 lines.push(`   >>> ${p.pivot.note.toUpperCase()}\n`);
+
+                lines.push('\x1B\x21\x00'); // Normale
                 lines.push('\x1B\x45\x00');
 
             }

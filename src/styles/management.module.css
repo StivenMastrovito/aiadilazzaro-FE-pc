@@ -63,7 +63,7 @@
 
 
 .header h2 {
-    font-size: 1.8rem;
+    font-size: 1.3rem;
     font-weight: 700;
     color: #ffffff;
     margin: 0;
@@ -841,10 +841,8 @@ form[onSubmit*="deleteCategory"] .button_submit:hover {
     padding: 0 10px;
     height: 100%;
     font-size: 14px;
-    width: 150px;
-    /* Regola la larghezza in base alle tue esigenze */
+    width: 100px;
     border-right: 1px solid #dddddd;
-    /* Separatore sottile tra input e select */
 }
 
 /* Dropdown delle categorie */

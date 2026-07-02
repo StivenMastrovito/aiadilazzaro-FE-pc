@@ -35,25 +35,43 @@ export default function Order() {
     const [newName, setNewName] = useState('');
     const [showFormName, setShowFormName] = useState(false);
 
-
+ useEffect(() => {
+        if (!filteredProductsId || !products) return setFilteredProducts(null);
+        const filtered = products.filter((p) => p.category_id === filteredProductsId);
+        setFilteredProducts(filtered);
+    }, [filteredProductsId, products]);
 
     useEffect(() => {
-        setLoad(true);
-        if (!order_id || !orders || !categories || !products || !tables) return
-        const foundOrder = orders.find((o) => o.id === Number(order_id));
-        setCopyOrderProducts(foundOrder?.products);
-        setOrder(foundOrder || []);
-        setNewPeoples(foundOrder?.peoples)
-        setNewName(foundOrder?.name)
-        setLoad(false);
-    }, [order_id, orders, categories, products, tables]);
+        if (!order_id) return;
+        setLoad(true)
+        const fetchOrder = async () => {
+            try {
+                const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/orders/${order_id}`);
+                console.log(response);
+                setOrder(response.data);
+                setCopyOrderProducts(response.data.products);
+                setNewPeoples(response.data.peoples)
+                setNewName(response.data.name)
+            } catch (err) {
+                console.log(err);
+                
+                setError("C'è stato un errore riprova!");
+                setTimeout(() => {
+                    setError(null);
+                }, 3000)
+            } finally {
+                setLoad(false);
+            }
+        }
+        fetchOrder();
+    }, [order_id])
 
     useEffect(() => {
         const channelOrders = supabase
             .channel('orders-channel')
             .on(
                 'postgres_changes',
-                { event: '*', schema: 'public', table: 'order_product' },
+                { event: '*', schema: 'public', table: 'order_product', filter: `order_id=eq.${order_id}`, },
                 async (payload) => {
                     const ordersResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/orders/${order_id}`);
                     setOrder(ordersResponse.data);
@@ -64,16 +82,11 @@ export default function Order() {
         return () => {
             supabase.removeChannel(channelOrders)
         }
-    }, [])
+    }, [order_id])
 
-    useEffect(() => {
-        if (!filteredProductsId || !products) return setFilteredProducts(null);
-        const filtered = products.filter((p) => p.category_id === filteredProductsId);
-        setFilteredProducts(filtered);
-    }, [filteredProductsId, products]);
+   
 
     function addProduct(product, isNote, note) {
-        console.log(cart, cartNote);
         if (isNote) {
             return setCartNote(prev => [...prev, { ...product, qty: 1, note, scope: 1 }])
         } else {
@@ -255,8 +268,7 @@ export default function Order() {
         try {
             setLoad(true);
             const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/orders/close/${order.id}`);
-            console.log(response);
-            await setTables(response.data.data);
+            setTables(response.data.data);
             navigate('/service');
         } catch (err) {
             setError("C'è stato un errore riprova!");
@@ -272,14 +284,14 @@ export default function Order() {
     return (
         <div className={style.container_order}>
             {error && <Error message={error} />}
-            {load ? <Load /> :
+            {load || !order ? <Load /> :
                 <>
                     <div className={style.order_header}>
                         <Link to='/service' className={style.button_go_back}>
                             INDIETRO
                         </Link>
                         <div onClick={() => setShowFormName(true)} style={{ 'cursor': "pointer" }}>
-                            TAVOLO: {order?.table.number || 'N/A'} - {order && order.name}
+                            TAVOLO: {order.table.number || 'N/A'} - {order && order.name}
                         </div>
                         <div onClick={() => setShowFormPeoples(true)} style={{ 'cursor': "pointer" }} >
                             COPERTI: {order && order.peoples}

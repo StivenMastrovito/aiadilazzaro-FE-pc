@@ -14,7 +14,7 @@ export default function Service() {
                 <h1>SERVIZIO</h1>
             </div>
             <div className={style.grid}>
-                {tables?.map(item => (
+                {tables?.sort((a, b) => a.number - b.number).map(item => (
                     <Link to={item.open_order_id !== 0 ? `/management/order/${item.open_order_id}` : '#'} state={{ table: item }} key={item.id}
                         className={
                             item.open_order_id !== 0

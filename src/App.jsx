@@ -12,6 +12,7 @@ import Order from './pages/device/Order'
 import Service from './pages/management/Service'
 import OrderManagement from './pages/management/Order';
 import SingleOrder from './pages/management/SingleOrder'
+import Stats from './pages/management/Stats'
 
 function App() {
 
@@ -28,6 +29,7 @@ function App() {
               <Route path='/tables' element={<Tables />} />
               <Route path='/orders' element={<Orders />} />
               <Route path='/orders/:order_id' element={<SingleOrder />} />
+              <Route path='/stats' element={<Stats />} />
             </Route>
 
             <Route path='/service' element={<Service />} />

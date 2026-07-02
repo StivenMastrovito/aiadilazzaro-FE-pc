@@ -21,6 +21,9 @@ export default function ManagemantLayout() {
                     <NavLink to={'/orders'}>
                         ORDINI
                     </NavLink>
+                    <NavLink to={'/stats'}>
+                        STATISTICHE
+                    </NavLink>
                 </nav>
             </header>
             <div className={style.content}>

@@ -829,9 +829,7 @@ form[onSubmit*="deleteCategory"] .button_submit:hover {
     background-color: #ffffff;
     border: 1px solid #cccccc;
     overflow: hidden;
-    /* Taglia i bordi degli elementi interni mantenendo la forma */
     height: 32px;
-    /* Altezza compatta simile allo screenshot */
 }
 
 /* Input di testo per il nome */
@@ -842,7 +840,7 @@ form[onSubmit*="deleteCategory"] .button_submit:hover {
     height: 100%;
     font-size: 14px;
     width: 100px;
-    border-right: 1px solid #dddddd;
+    border-right: 1px solid gray;
 }
 
 /* Dropdown delle categorie */
@@ -855,12 +853,10 @@ form[onSubmit*="deleteCategory"] .button_submit:hover {
     font-size: 14px;
     color: #333333;
     cursor: pointer;
-    /* Rimuove la freccia standard del browser se vuoi uniformarla (opzionale) */
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
     padding-right: 25px;
-    /* Spazio per una freccia custom o per non sovrapporre il testo */
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 4 5'><path fill='%23333' d='M2 0L0 2h4zm0 5L0 3h4z'/></svg>");
     background-repeat: no-repeat;
     background-position: right 8px center;
@@ -875,9 +871,22 @@ form[onSubmit*="deleteCategory"] .button_submit:hover {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    border-left: 1px solid #dddddd;
+    border-left: 1px solid gray;
     color: #333333;
     transition: background-color 0.2s ease;
+}
+
+.filter_group .filter_group_date {
+    border: none;
+    outline: none;
+    padding: 0 10px;
+    height: 100%;
+    font-size: 14px;
+    color: black;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-left: 1px solid gray
 }
 
 .filter_group button:hover {

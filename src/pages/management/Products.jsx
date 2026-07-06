@@ -7,7 +7,7 @@ import Error from "../../components/Error";
 
 export default function Products() {
     const { products, setProducts, categories } = useData();
-    const [newProduct, setNewProduct] = useState({ name: '', price: 0, description: null, category_id: 1 });
+    const [newProduct, setNewProduct] = useState({ name: '', price: 0, description: '', category_id: '' });
     const [updateProduct, setUpdateProduct] = useState(null);
 
     const [showStore, setShowStore] = useState(false);
@@ -47,6 +47,7 @@ export default function Products() {
     const addProduct = async (e) => {
         e.preventDefault();
         setLoad(true);
+        console.log(newProduct)
         try {
             const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/products`, newProduct);
             console.log(response);
@@ -65,7 +66,7 @@ export default function Products() {
 
         } finally {
             setLoad(false);
-            setNewProduct({ name: '', price: 0, description: '', category_id: 0 });
+            setNewProduct({ name: '', price: 0, description: '', category_id: '' });
             setShowStore(false)
         }
     }
@@ -199,6 +200,7 @@ export default function Products() {
                                 <div className={style.group_form}>
                                     <label htmlFor="category_id">CATEGORIA:</label>
                                     <select name="category_id" id="category_id" value={newProduct.category_id} onChange={(e) => updateForm(setNewProduct, e)}>
+                                        <option value="">Seleziona una categoria...</option>
                                         {categories && categories.map(item => (
                                             <option key={item.id} value={item.id}>{item.name.toUpperCase()}</option>
                                         ))}
